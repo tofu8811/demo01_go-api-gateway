@@ -17,6 +17,7 @@ func main() {
 
 	app := fiber.New()
 
+	authURL := os.Getenv("AUTH_SERVICE_URL")
 	productURL := os.Getenv("PRODUCT_SERVICE_URL")
 	orderURL := os.Getenv("ORDER_SERVICE_URL")
 
@@ -25,6 +26,15 @@ func main() {
 			"message": "Go Fiber API Gateway is running",
 		})
 	})
+
+	// Auth routes
+	app.Post("/api/user/register", proxy(authURL+"/user/register", http.MethodPost))
+	app.Post("/api/auth/login", proxy(authURL+"/auth/login", http.MethodPost))
+
+	app.Get("/api/user/profile", proxy(authURL+"/user/profile", http.MethodGet))
+	app.Put("/api/user/update", proxy(authURL+"/user/update", http.MethodPut))
+	app.Put("/api/auth/token-refresh", proxy(authURL+"/auth/token-refresh", http.MethodPut))
+	app.Delete("/api/auth/token-revoke", proxy(authURL+"/auth/token-revoke", http.MethodDelete))
 
 	// Product routes
 	app.Get("/api/products", proxy(productURL+"/products", http.MethodGet))
